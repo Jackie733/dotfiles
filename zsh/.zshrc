@@ -8,7 +8,7 @@ export ZSH="$HOME/.oh-my-zsh"
 # load a random theme each time Oh My Zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-ZSH_THEME="robbyrussell"
+ZSH_THEME="afowler"
 
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME=random will cause zsh to load
@@ -85,11 +85,11 @@ source $ZSH/oh-my-zsh.sh
 # if [[ -n $SSH_CONNECTION ]]; then
 #   export EDITOR='vim'
 # else
-#   export EDITOR='mvim'
+#   export EDITOR='nvim'
 # fi
 
 # Compilation flags
-# export ARCHFLAGS="-arch x86_64"
+# export ARCHFLAGS="-arch $(uname -m)"
 
 # Set personal aliases, overriding those provided by Oh My Zsh libs,
 # plugins, and themes. Aliases can be placed here, though Oh My Zsh
@@ -102,64 +102,39 @@ source $ZSH/oh-my-zsh.sh
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
+
 alias vi=nvim
 alias cls=clear
+alias lg=lazygit
 
-alias python=python3
-alias upload="node ~/code/toolkit/index.js"
+#启用彩色输出
+alias ls='ls --color=auto'
+alias grep='grep --color=auto'
+alias diff='diff --color=auto'
 
-# ssh to local servers
-alias stest="ssh -a amax@192.168.1.109"
-alias sprod="ssh -a amax@192.168.1.119"
+# 快捷代理开关
+alias proxy="export http_proxy=http://127.0.0.1:2334; export https_proxy=http://127.0.0.1:2334; export all_proxy=socks5://127.0.0.1:2333; echo '🚀 终端代理已开启'"
+alias unproxy="unset http_proxy https_proxy all_proxy; echo '🛑 终端代理已关闭'"
 
-ascii() {
-  local cols=8  # 每行显示的列数
-  local max=127 # ASCII 范围最大值
-  local i=0     # 循环计数器
-
-  printf "ASCII Table"
-  echo
-
-  for ((i = 0; i <= max; i++)); do
-    # 打印一列：十进制值和对应字符
-    if ((i >= 32 && i <= 126)); then
-      printf " %3d  %-2s |" $i "$(printf "\\$(printf '%03o' $i)")"
-    else
-      printf " %3d     |" $i
-    fi
-
-    # 如果列满，换行
-    if (( (i + 1) % cols == 0 )); then
-      echo
-    fi
-  done
-
-  # 确保最后一行换行
-  if (( i % cols != 0 )); then
-    echo
-  fi
-}
-
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-
-eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+alias check="curl -L ip.gs"
 
 # fnm
-FNM_PATH="/home/jackie/.local/share/fnm"
+FNM_PATH="/home/tsien/.local/share/fnm"
 if [ -d "$FNM_PATH" ]; then
-  export PATH="/home/jackie/.local/share/fnm:$PATH"
+  export PATH="$FNM_PATH:$PATH"
   eval "`fnm env`"
 fi
 
-# bun completions
-[ -s "/home/jackie/.bun/_bun" ] && source "/home/jackie/.bun/_bun"
+# 自动检测并开启代理
+if ss -nlt | grep -q ":2334"; then
+    export http_proxy="http://127.0.0.1:2334"
+    export https_proxy="http://127.0.0.1:2334"
+    export all_proxy="socks5://127.0.0.1:2333"
+    # 排除本地流量，防止访问 MetacubeXD 或本地开发服务时出错
+    export no_proxy="localhost,127.0.0.1,192.168.1.5,192.168.1.1,*.local,*.test"
+    # 给个温馨提示，不需要可以删掉
+    # echo "🚀 Proxy auto-enabled"
+fi
 
-# bun
-export BUN_INSTALL="$HOME/.bun"
-export BUN_PATH="$BUN_INSTALL/bin:$PATH"
 
-export PATH="$HOME/.local/bin:$PATH"
-
-eval "$(/home/jackie/.local/bin/mise activate zsh)"
+. "$HOME/.local/bin/env"
